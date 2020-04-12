@@ -3,59 +3,109 @@
   <div>
     <h2>Category listing</h2>
 
-    <div v-if="!updateSuccess" class="alert alert-danger">Failed to update ! Please try again later.</div>
-    <div
-      v-if="!getCategoriesSuccess"
-      class="alert alert-danger"
-    >Failed to get categories ! Please try again later.</div>
-    <div>
-      <b-alert
-        :show="dismissCountDownForUpdate"
-        dismissible
-        variant="success"
-        @dismissed="dismissCountDownForUpdate=0"
-        @dismiss-count-down="countDownChanged"
-      >Successfully updated '{{ latestUpdatedName }}'!</b-alert>
-    </div>
+    <b-container>
+      <b-col lg="12" class="my-4">
+        <b-alert v-model="isUpdateFailed" variant="danger" dismissible>
+          Failed to update ! Please try again later. 
+        </b-alert>
+      </b-col>
+    
+      <b-col lg="12" class="my-4">
+        <b-alert v-model="showCategoriesAlert" variant="danger" dismissible>
+          Failed to get categories ! Please try again later.  
+        </b-alert>
+        <!-- <div v-if="!getCategoriesSuccess" class="alert alert-danger">
+          
+        </div> -->
+      </b-col>
+  
+      <b-col lg="12" class="my-4">
+        <b-alert
+          :show="dismissCountDownForUpdate"
+          dismissible
+          variant="success"
+          @dismissed="dismissCountDownForUpdate=0"
+          @dismiss-count-down="countDownChanged"
+        >Successfully updated '{{ latestUpdatedName }}'!</b-alert>
+      </b-col>
 
-    <div>
-      <b-alert
-        :show="dismissCountDownForDelete"
-        dismissible
-        variant="warning"
-        @dismissed="dismissCountDownForDelete=0"
-        @dismiss-count-down="countDownChangedForDeleted"
-      >Successfully deleted '{{ latestUpdatedName }}'!</b-alert>
-    </div>
+      <b-col lg="12" class="my-4">
+        <b-alert
+          :show="dismissCountDownForDelete"
+          dismissible
+          variant="warning"
+          @dismissed="dismissCountDownForDelete=0"
+          @dismiss-count-down="countDownChangedForDeleted"
+        >Successfully deleted '{{ latestUpdatedName }}'!</b-alert>
+      </b-col>
+    </b-container>
+   
 
-    <b-table-simple hover small caption-top responsive>
-      <b-thead>
-        <b-tr>
-          <b-th>Name</b-th>
-          <b-th>Product Count</b-th>
-          <b-th></b-th>
-          <b-th></b-th>
-        </b-tr>
-      </b-thead>
-      <b-tbody>
-        <b-tr v-for="category in categories" :key="category.CategoryId">
-          <b-td>
-            <b-form-input type="text" v-model="category.CategoryName" />
-          </b-td>
-          <b-td>{{ category.ProductCount }}</b-td>
-          <b-td>
-            <b-button @click="updateName(category)" variant="success">
-              <b-icon-hammer></b-icon-hammer>
-            </b-button>
-          </b-td>
-          <b-td>
-            <b-button @click="deleteCategory(category)" variant="success">
-              <b-icon-trash></b-icon-trash>
-            </b-button>
-          </b-td>
-        </b-tr>
-      </b-tbody>
-    </b-table-simple>
+    <b-container>
+      <b-col lg="12" class="my-4">
+        <b-row>
+          <b-form-group
+            label="Filter"
+            label-cols-sm="3"
+            label-align-sm="right"
+            label-size="sm"
+            label-for="filterInput"
+            class="mb-0"
+          >
+            <b-input-group size="sm">
+              <b-form-input
+                v-model="filter"
+                type="search"
+                id="filterInput"
+                placeholder="Type to Search"
+              ></b-form-input>
+              <b-input-group-append>
+                <b-button :disabled="!filter" @click="filter = ''">Clear</b-button>
+              </b-input-group-append> 
+            </b-input-group>
+          </b-form-group>
+        </b-row>
+      </b-col>
+
+      <b-table
+        id="my-table"
+          :busy.sync="isBusy"
+          :items="categories"
+          :fields="fields"
+          hover
+          primary-key="CategoryId"
+          small
+          class="text-center"
+          :filter="filter"
+          >
+
+        <template v-slot:table-busy>
+          <div class="text-center text-danger my-2">
+            <b-spinner class="align-middle"></b-spinner>
+            <strong>Loading...</strong>
+          </div>
+        </template>
+
+        <template v-slot:cell(CategoryName)="row">
+          <b-form-input  type="text" v-model="row.item.CategoryName" />
+        </template>
+
+        <template v-slot:cell(update)="row">
+          <b-button @click="updateName(row.item)" variant="success">
+            <b-icon-hammer></b-icon-hammer>
+          </b-button>
+        </template>
+
+        <template v-slot:cell(delete)="row">
+          <b-button @click="deleteCategory(row.item)" variant="warning">
+            <b-icon-trash></b-icon-trash>
+          </b-button>
+        </template>
+
+      </b-table>
+      
+    </b-container>
+    
   </div>
 </template>
 
@@ -75,40 +125,48 @@ export default {
           sortable: true
         },
         {
-          key: 'delete',
-          label: '',
+          key: 'update',
+          label: 'Update',
           sortable: false
         },
         {
-          key: 'update',
-          label: '',
+          key: 'delete',
+          label: 'Delete',
           sortable: false
         }
       ],
       sortKey: '',
       reverse: false,
-      updateSuccess: true,
-      getCategoriesSuccess: true,
+      isUpdateFailed: false,
+      showCategoriesAlert: false,
       dismissCountDownForUpdate: 0,
       dismissCountDownForDelete: 0,
-      latestUpdatedName: ''
+      latestUpdatedName: '',
+      isBusy: false,
+      filter: null
     }
   },
   methods: {
     updateName(categoryObject) {
-      this.updateSuccess = true
+      this.isUpdateFailed = false
+      this.isBusy = true
+      console.log(categoryObject)
       this.$store
         .dispatch('updateCategory', categoryObject)
         .then(() => {
           this.latestUpdatedName = categoryObject.CategoryName
           this.dismissCountDownForUpdate = 5
+          this.isBusy = false
         })
         .catch(() => {
-          this.updateSuccess = false
+          this.isUpdateFailed = true
+          this.isBusy = false
         })
     },
     deleteCategory(categoryObject) {
-      this.updateSuccess = true
+      this.isUpdateFailed = false
+      this.isBusy = true
+
       this.$store
         .dispatch('deleteCategory', categoryObject.CategoryId)
         .then(() => {
@@ -117,14 +175,17 @@ export default {
           this.$store
             .dispatch('fetchCategories')
             .then(() => {
-              this.getCategoriesSuccess = true
+              this.showCategoriesAlert = false
+              this.isBusy = false
             })
             .catch(() => {
-              this.getCategoriesSuccess = false
+              this.showCategoriesAlert = true
+              this.isBusy = false
             })
         })
         .catch(() => {
-          this.updateSuccess = false
+          this.isUpdateFailed = true
+          this.isBusy = false
         })
     },
     countDownChanged(dismissCountDown) {
@@ -138,16 +199,25 @@ export default {
     // CategoryCard
   },
   created() {
+    this.isBusy = true
     if (!this.authToken) {
       this.$store.dispatch('getAuthToken').then(() => {
-        this.$store.dispatch('fetchCategories').catch(() => {
-          this.getCategoriesSuccess = false
-        })
+        this.$store
+          .dispatch('fetchCategories')
+          .then(() => (this.isBusy = false))
+          .catch(() => {
+            this.showCategoriesAlert = true
+            this.isBusy = false
+          })
       })
     } else {
-      this.$store.dispatch('fetchCategories').catch(() => {
-        this.getCategoriesSuccess = false
-      })
+      this.$store
+        .dispatch('fetchCategories')
+        .then(() => (this.isBusy = false))
+        .catch(() => {
+          this.showCategoriesAlert = true
+          this.isBusy = false
+        })
     }
   },
   computed: {
@@ -162,8 +232,7 @@ export default {
 </script>
 
 <style>
-.category:hover {
-  transform: scale(1.01);
-  box-shadow: 0 3px 12px 0 rgba(0, 0, 0, 0.2), 0 1px 15px 0 rgba(0, 0, 0, 0.19);
+.margin-spacing {
+  margin-bottom: 10px;
 }
 </style>
