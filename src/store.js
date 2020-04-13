@@ -41,60 +41,29 @@ export default new Vuex.Store({
       })
     },
     fetchCategories(context) {
-      return new Promise((resolve, reject) => {
-        CategoryService.getCategoriesWithProductCount(
-          context.state.authorizationToken
-        )
-          .then(response => {
-            context.commit('SET_CATEGORIES', response.data)
-            resolve(response)
-          })
-          .catch(error => {
-            reject(error)
-          })
+      return CategoryService.getCategoriesWithProductCount(
+        context.state.authorizationToken
+      ).then(response => {
+        context.commit('SET_CATEGORIES', response.data)
       })
     },
     updateCategory(context, category) {
-      return new Promise((resolve, reject) => {
-        CategoryService.updateCategory(
-          category,
-          context.state.authorizationToken
-        )
-          .then(response => {
-            resolve(response)
-          })
-          .catch(error => {
-            reject(error)
-          })
-      })
+      return CategoryService.updateCategory(
+        category,
+        context.state.authorizationToken
+      )
     },
     deleteCategory(context, categoryId) {
-      return new Promise((resolve, reject) => {
-        CategoryService.deleteCategory(
-          categoryId,
-          context.state.authorizationToken
-        )
-          .then(response => {
-            resolve(response)
-          })
-          .catch(error => {
-            reject(error)
-          })
-      })
+      return CategoryService.deleteCategory(
+        categoryId,
+        context.state.authorizationToken
+      )
     },
     createCategory(context, categoryName) {
-      return new Promise((resolve, reject) => {
-        CategoryService.createCategory(
-          categoryName,
-          context.state.authorizationToken
-        )
-          .then(response => {
-            resolve(response)
-          })
-          .catch(error => {
-            reject(error)
-          })
-      })
+      return CategoryService.createCategory(
+        categoryName,
+        context.state.authorizationToken
+      )
     }
   },
   modules: {},
