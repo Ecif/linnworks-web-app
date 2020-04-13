@@ -1,5 +1,11 @@
 # linnworks-web-app
 
+This is a job test project for Linnworks. 
+
+Used Vue to create frontend client app to display categories data.
+
+Backend for this: https://github.com/Ecif/LinnworksCategoryApi
+
 ## Project setup
 
 ```
