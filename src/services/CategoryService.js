@@ -6,7 +6,6 @@ const apiClient = axios.create({
 
 export default {
   getCategories(authToken) {
-    console.log(authToken)
     return apiClient.get('/api/getCategories', {
       headers: {
         Authorization: authToken

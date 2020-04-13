@@ -5,20 +5,24 @@
 
     <b-container>
       <b-col lg="12" class="my-4">
-        <b-alert v-model="isUpdateFailed" variant="danger" dismissible>
-          Failed to update ! Please try again later. 
-        </b-alert>
+        <b-alert
+          v-model="isUpdateFailed"
+          variant="danger"
+          dismissible
+        >Failed to update ! Please try again later.</b-alert>
       </b-col>
-    
+
       <b-col lg="12" class="my-4">
-        <b-alert v-model="showCategoriesAlert" variant="danger" dismissible>
-          Failed to get categories ! Please try again later.  
-        </b-alert>
+        <b-alert
+          v-model="showCategoriesAlert"
+          variant="danger"
+          dismissible
+        >Failed to get categories ! Please try again later.</b-alert>
         <!-- <div v-if="!getCategoriesSuccess" class="alert alert-danger">
           
-        </div> -->
+        </div>-->
       </b-col>
-  
+
       <b-col lg="12" class="my-4">
         <b-alert
           :show="dismissCountDownForUpdate"
@@ -39,7 +43,6 @@
         >Successfully deleted '{{ latestUpdatedName }}'!</b-alert>
       </b-col>
     </b-container>
-   
 
     <b-container>
       <b-col lg="12" class="my-4">
@@ -61,7 +64,7 @@
               ></b-form-input>
               <b-input-group-append>
                 <b-button :disabled="!filter" @click="filter = ''">Clear</b-button>
-              </b-input-group-append> 
+              </b-input-group-append>
             </b-input-group>
           </b-form-group>
         </b-row>
@@ -69,16 +72,15 @@
 
       <b-table
         id="my-table"
-          :busy.sync="isBusy"
-          :items="categories"
-          :fields="fields"
-          hover
-          primary-key="CategoryId"
-          small
-          class="text-center"
-          :filter="filter"
-          >
-
+        :busy.sync="isBusy"
+        :items="categories"
+        :fields="fields"
+        hover
+        primary-key="CategoryId"
+        small
+        class="text-center"
+        :filter="filter"
+      >
         <template v-slot:table-busy>
           <div class="text-center text-danger my-2">
             <b-spinner class="align-middle"></b-spinner>
@@ -87,7 +89,7 @@
         </template>
 
         <template v-slot:cell(CategoryName)="row">
-          <b-form-input  type="text" v-model="row.item.CategoryName" />
+          <b-form-input type="text" v-model="row.item.CategoryName" />
         </template>
 
         <template v-slot:cell(update)="row">
@@ -101,11 +103,8 @@
             <b-icon-trash></b-icon-trash>
           </b-button>
         </template>
-
       </b-table>
-      
     </b-container>
-    
   </div>
 </template>
 
@@ -150,7 +149,6 @@ export default {
     updateName(categoryObject) {
       this.isUpdateFailed = false
       this.isBusy = true
-      console.log(categoryObject)
       this.$store
         .dispatch('updateCategory', categoryObject)
         .then(() => {

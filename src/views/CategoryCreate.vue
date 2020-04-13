@@ -9,8 +9,7 @@
           variant="danger"
           @dismissed="dismissCountDown = 0"
           @dismiss-count-down="countDownChanged"
-          >{{ error }}</b-alert
-        >
+        >{{ error }}</b-alert>
         <!-- <div v-if="error" class="alert alert-danger">Error! </div> -->
       </b-col>
 
@@ -26,14 +25,7 @@
             ></b-form-input>
           </b-form-group>
 
-          <b-button
-            :disabled="disabled"
-            class="mr-1"
-            type="submit"
-            variant="success"
-          >
-            Submit
-          </b-button>
+          <b-button :disabled="disabled" class="mr-1" type="submit" variant="success">Submit</b-button>
           <b-button type="reset" variant="warning">Reset</b-button>
         </b-form>
       </b-col>
@@ -62,7 +54,6 @@ export default {
         .then(response => {
           this.disabled = false
           const status = JSON.parse(response.status)
-          console.log(status)
           //redirect logic
           if (status == '200') {
             this.$router.push({ name: 'category-list' })
